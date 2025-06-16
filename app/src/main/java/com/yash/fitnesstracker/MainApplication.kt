@@ -3,6 +3,7 @@ package com.yash.fitnesstracker
 import android.app.Application
 import com.yash.fitnesstracker.repository.AppContainer
 import com.yash.fitnesstracker.repository.DefaultAppContainer
+import com.yash.fitnesstracker.repository.StepRepository
 
 class MainApplication : Application()
 {
@@ -11,5 +12,6 @@ class MainApplication : Application()
     {
         super.onCreate()
         container = DefaultAppContainer(this)
+        StepRepository.initialize(applicationContext)
     }
 }

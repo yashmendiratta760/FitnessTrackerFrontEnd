@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,7 @@ import com.yash.fitnesstracker.Login_Signup.Screens.Components.OtpInput
 import com.yash.fitnesstracker.Login_Signup.data.otpValidateData
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.R
+import com.yash.fitnesstracker.navigation.Screens
 
 @Composable
 fun Otp(LoginSignupViewModel: LoginSignupViewModel,
@@ -41,24 +44,50 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
 
     var otpe by remember { mutableStateOf("") }
 
-    Column( modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)) {
-        Image(
-            painter = painterResource(R.drawable.main_page_removebg_preview),
-            contentDescription = "Chat Image",
-            modifier = Modifier.fillMaxWidth()
-                .size(400.dp)
-        )
-        Spacer(modifier = Modifier.padding(10.dp))
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Column(
-
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(start = 16.dp, end = 16.dp, top = 50.dp)
         ) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.picture3),
+                    contentDescription = "Verification Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.size(200.dp)
+//                        .padding(96.dp)
+                )
+            }
 
-            OtpInput { otp ->
-                otpe = otp
+            Spacer(modifier = Modifier.height(50.dp))
+
+            // Assuming 'big', 'bold', 'medium', 'light' are custom TextStyles or modifiers.
+            // Replace with appropriate MaterialTheme typography or define them if you haven't.
+            Text(
+                text = "Verification",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Text(
+                text = "Otp has been sent to your email.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+
+            )
+            Spacer(modifier = Modifier.height(50.dp))
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            OtpInput { enteredOtp ->
+                otpe = enteredOtp
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -70,15 +99,17 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
                     if (uiState.validation_status == 400) {
                         Toast.makeText(context, "Enter correct otp", Toast.LENGTH_SHORT).show()
                     } else {
-                        navController.navigate("home"){
+                        navController.navigate(Screens.Home.name){
                             popUpTo(0){inclusive=true}
                         }
                         Toast.makeText(context, "Signup Succesfull", Toast.LENGTH_SHORT).show()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
             ) {
-                Text(text = "Signup")
+                Text(text = "Verify")
             }
         }
     }

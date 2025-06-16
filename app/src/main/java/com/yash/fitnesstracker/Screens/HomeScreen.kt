@@ -35,15 +35,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.yash.fitnesstracker.Login_Signup.Screens.Components.DialogueBoxOpt
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.Screens.Components.CircularProgress
+import com.yash.fitnesstracker.Screens.Components.CustomizedButton
 import com.yash.fitnesstracker.Service. ForegroundService
+import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.viewmodel.appViewModel
 import java.text.DecimalFormat
 
@@ -68,11 +73,6 @@ fun HomeScreen(modifier: Modifier= Modifier,
     Log.d("UI", "Steps from ViewModel: $steps")
     val progress = steps / 10000f
     val time by remember { mutableStateOf(0)}
-
-    LaunchedEffect(steps)
-    {
-        appViewModel.insertOrUpdateInRoom(steps)
-    }
 
 
     Column {
@@ -100,7 +100,7 @@ fun HomeScreen(modifier: Modifier= Modifier,
                 onLogoutClick = {
                     showDetail.value=false
                     loginSignupViewModel.logout(context){
-                    navController.navigate("login"){
+                    navController.navigate(Screens.Login.name){
                         popUpTo(0){inclusive=true}
                     }
                 }
@@ -109,7 +109,7 @@ fun HomeScreen(modifier: Modifier= Modifier,
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
 
             item {
@@ -117,37 +117,62 @@ fun HomeScreen(modifier: Modifier= Modifier,
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CircularProgress(progress = progress)
-                    Text(text = steps.toString(), fontSize = 50.sp)
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.size(170.dp)
+                    ) {
+                        CircularProgress(progress = progress, modifier = Modifier.fillMaxSize())
+                        Text(text = steps.toString(), fontSize = 40.sp)
+                    }
 
                 }
             }
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     val df = DecimalFormat("#.##")
-                    Column {
-                        val km = 0.00072f*steps
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        val km = 0.00075f*steps
                         val formatted = df.format(km)
-                        Text(formatted.toString(), color = Color.Green, fontSize = 30.sp)
-                        Text("km", color = Color.Blue,fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text(formatted.toString(), color = Color(0xFF0090F6), fontSize = 30.sp)
+                        Text("Km", color = Color.White,
+                             fontSize = 20.sp)
                     }
-                    Column {
-                        val kcal = 0.035f*steps
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        val kcal = 0.045f*steps
                         val formatted = df.format(kcal)
-                        Text(formatted.toString(),color = Color.Green, fontSize = 30.sp)
-                        Text("kcal", color = Color.Blue, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Text(formatted.toString(),color = Color(0xFF0090F6), fontSize = 30.sp)
+                        Text("kcal", color = Color.White,
+                             fontSize = 20.sp)
                     }
-                    Text("Activity Time")
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("20",color = Color(0xFF0090F6), fontSize = 30.sp)
+                        Text("Time", color = Color.White, fontSize = 20.sp)
+                    }
                 }
             }
             item {
                 Column {
-                    Text("Daily history")
-                    Text("Weekly history")
-                    Text("monthly history")
+                    CustomizedButton(text = "Daily History", onClick = {
+                        navController.navigate(Screens.DailyHistory.name)
+                    },
+                        modifier = Modifier.padding(top = 26.dp, start = 16.dp,
+                            end = 16.dp))
+                    CustomizedButton(text = "Weekly History", onClick = {
+                        navController.navigate(Screens.WeeklyHistory.name)
+                    },
+                        modifier = Modifier.padding(top = 16.dp,start = 16.dp,
+                            end = 16.dp))
+                    CustomizedButton(text = "Monthly History", onClick = {
+                        navController.navigate(Screens.MonthlyHistory.name)
+                    },
+                        modifier = Modifier.padding(top = 16.dp,start = 16.dp,
+                            end = 16.dp))
+
                 }
             }
         }

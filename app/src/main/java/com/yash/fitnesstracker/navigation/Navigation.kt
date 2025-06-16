@@ -13,7 +13,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.yash.fitnesstracker.Login_Signup.Screens.Login
-import com.yash.fitnesstracker.Login_Signup.Screens.OpenPage
 import com.yash.fitnesstracker.Login_Signup.Screens.Otp
 import com.yash.fitnesstracker.Login_Signup.Screens.SignUp
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
@@ -24,6 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.work.impl.schedulers
+import com.yash.fitnesstracker.Screens.DailyHistory
+import com.yash.fitnesstracker.Screens.MonthlyHistory
+import com.yash.fitnesstracker.Screens.WeeklyHistory
 import com.yash.fitnesstracker.repository.TokenManager
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -38,23 +41,29 @@ fun navigate(navController:NavHostController= rememberNavController(),modifier: 
     LaunchedEffect(Unit) {
         token = TokenManager.getToken(context)
     }
-    val startDestination = if (token.isNullOrEmpty()) "login" else "home"
+    val startDestination = if (token.isNullOrEmpty()) Screens.Login.name else Screens.Home.name
     NavHost(navController=navController, startDestination = startDestination) {
-        composable(route="open") {
-            OpenPage(navController)
-        }
-        composable(route = "Signup") {
+        composable(route = Screens.Signup.name) {
             SignUp(navController = navController, loginSignupViewModel)
         }
-        composable(route="login") {
+        composable(route= Screens.Login.name) {
             Login(navController, loginSignupViewModel,loginSignupUiState)
         }
-        composable(route = "otp") {
+        composable(route = Screens.Otp.name) {
             Otp(loginSignupViewModel,navController)
         }
-        composable(route="home"){
+        composable(route = Screens.Home.name){
             HomeScreen(appViewModel = appViewModel, loginSignupViewModel = loginSignupViewModel,
                 navController = navController)
+        }
+        composable(route = Screens.DailyHistory.name) {
+            DailyHistory(navController=navController)
+        }
+        composable(route = Screens.MonthlyHistory.name) {
+            MonthlyHistory(navController=navController)
+        }
+        composable(route = Screens.WeeklyHistory.name) {
+            WeeklyHistory(navController=navController)
         }
     }
 }

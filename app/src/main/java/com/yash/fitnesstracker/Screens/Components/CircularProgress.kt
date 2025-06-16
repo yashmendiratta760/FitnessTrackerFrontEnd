@@ -11,20 +11,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CircularProgress(progress: Float)
+fun CircularProgress(progress: Float,
+                     modifier: Modifier= Modifier)
 {
     CircularProgressIndicator(
         progress = {progress},
         strokeWidth = 15.dp,
         strokeCap = StrokeCap.Butt,
-        trackColor = Color.Red, // whole
-        color = MaterialTheme.colorScheme.primary, // how much
-        modifier = Modifier.size(100.dp))
+        trackColor = Color(0xF1628FDE).copy(alpha = 0.3f),
+        color = Color(0xF1628FDE),
+        modifier = modifier.size(100.dp))
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
 fun pre()
 {
+
     CircularProgress(0.2f)
 }

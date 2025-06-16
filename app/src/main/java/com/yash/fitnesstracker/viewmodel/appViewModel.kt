@@ -30,6 +30,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -47,10 +49,10 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
         viewModelScope.launch {
             StepRepository.stepCount.collectLatest { steps ->
                 _uiState.value = _uiState.value.copy(steps = steps)
-                insertOrUpdateInRoom(steps)
             }
         }
     }
+
 
     fun scheduleDailyStepUpload(context: Context) {
 
@@ -77,25 +79,25 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
 
 
 
-    fun insertOrUpdateInRoom(steps:Int)
-    {
-        viewModelScope.launch {
-            val date = LocalDate.now()
-            val formattedDate = date.format(DateTimeFormatter.ISO_DATE)
-
-            val existingEntity = stepsLocalDbRepository.getStepsByDate(formattedDate)
-            if (existingEntity != null) {
-                // If exists, update the steps
-                val updatedEntity = existingEntity.copy(steps = steps)
-                stepsLocalDbRepository.update(updatedEntity)
-            } else {
-                // If not exists, insert a new entity
-                val newEntity = StepsEntities(steps = steps, date = formattedDate)
-                stepsLocalDbRepository.insert(newEntity)
-            }
-
-        }
-    }
+//    fun insertOrUpdateInRoom(steps:Int)
+//    {
+//        viewModelScope.launch {
+//            val date = LocalDate.now()
+//            val formattedDate = date.format(DateTimeFormatter.ISO_DATE)
+//
+//            val existingEntity = stepsLocalDbRepository.getStepsByDate(formattedDate)
+//            if (existingEntity != null) {
+//                // If exists, update the steps
+//                val updatedEntity = existingEntity.copy(steps = steps)
+//                stepsLocalDbRepository.update(updatedEntity)
+//            } else {
+//                // If not exists, insert a new entity
+//                val newEntity = StepsEntities(steps = steps, date = formattedDate)
+//                stepsLocalDbRepository.insert(newEntity)
+//            }
+//
+//        }
+//    }
 
     fun sendStepsToServerDb(steps:String)
     {

@@ -1,7 +1,9 @@
 package com.yash.fitnesstracker.Service
 
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -12,13 +14,19 @@ import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.yash.fitnesstracker.MainActivity
 import com.yash.fitnesstracker.R
+import com.yash.fitnesstracker.database.DataStoreManager
 import com.yash.fitnesstracker.repository.StepRepository
 import com.yash.fitnesstracker.viewmodel.AppUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class ForegroundService:Service(), SensorEventListener
 {
@@ -45,10 +53,25 @@ class ForegroundService:Service(), SensorEventListener
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
+
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        notificationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+
         val notification = NotificationCompat.Builder(this,"FitnessTrackerChannel")
             .setContentTitle("Steps Counter")
             .setContentText("Tracking your steps")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentIntent(pendingIntent)
             .build()
 
         startForeground(1,notification)
@@ -74,20 +97,19 @@ class ForegroundService:Service(), SensorEventListener
     }
     private var initialStepCount: Int? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onSensorChanged(event: SensorEvent?) {
         if (event==null|| event.sensor.type != Sensor.TYPE_STEP_COUNTER) return
 
         val stepSinceLastReboot = event.values[0].toInt()
 
-        if(initialStepCount==null)
-        {
-            initialStepCount=stepSinceLastReboot
+        CoroutineScope(Dispatchers.IO).launch {
+            val midnightBase = DataStoreManager.getMidnightBase(applicationContext)
+            val todaySteps = stepSinceLastReboot - midnightBase
+
+            StepRepository.updateSteps(todaySteps)
+            StepRepository.insertOrUpdateInRoom(todaySteps)
         }
-        val currentSteps = stepSinceLastReboot-initialStepCount!!
-
-
-
-        StepRepository.updateSteps(currentSteps)
 
     }
 
