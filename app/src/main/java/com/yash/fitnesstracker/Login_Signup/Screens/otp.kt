@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +35,8 @@ import com.yash.fitnesstracker.Login_Signup.data.otpValidateData
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.R
 import com.yash.fitnesstracker.navigation.Screens
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun Otp(LoginSignupViewModel: LoginSignupViewModel,
@@ -43,6 +46,7 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
     val context = LocalContext.current
 
     var otpe by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -94,15 +98,20 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
 
             Button(
                 onClick = {
-                    val data = otpValidateData(email = uiState.email, otpe)
-                    LoginSignupViewModel.Signup(data)
-                    if (uiState.validation_status == 400) {
-                        Toast.makeText(context, "Enter correct otp", Toast.LENGTH_SHORT).show()
-                    } else {
-                        navController.navigate(Screens.Home.name){
-                            popUpTo(0){inclusive=true}
+                    coroutineScope.launch {
+                        val data = otpValidateData(email = uiState.email, otp = otpe)
+                        LoginSignupViewModel.Signup(data)
+
+                        delay(500)
+
+                        if (LoginSignupViewModel.uiState.value.validation_status == 400) {
+                            Toast.makeText(context, "Enter correct OTP", Toast.LENGTH_SHORT).show()
+                        } else {
+                            navController.navigate(Screens.Login.name) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                            Toast.makeText(context, "Signup successful. Please login.", Toast.LENGTH_SHORT).show()
                         }
-                        Toast.makeText(context, "Signup Succesfull", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier

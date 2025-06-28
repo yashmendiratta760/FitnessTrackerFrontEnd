@@ -5,9 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,22 +14,22 @@ import com.yash.fitnesstracker.Login_Signup.Screens.Login
 import com.yash.fitnesstracker.Login_Signup.Screens.Otp
 import com.yash.fitnesstracker.Login_Signup.Screens.SignUp
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
-import com.yash.fitnesstracker.Screens.HomeScreen
+import com.yash.fitnesstracker.screens.HomeScreen
 import com.yash.fitnesstracker.viewmodel.appViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.work.impl.schedulers
-import com.yash.fitnesstracker.Screens.DailyHistory
-import com.yash.fitnesstracker.Screens.MonthlyHistory
-import com.yash.fitnesstracker.Screens.WeeklyHistory
+import com.yash.fitnesstracker.screens.DailyHistory
+import com.yash.fitnesstracker.screens.MonthlyHistory
+import com.yash.fitnesstracker.screens.WeeklyHistory
 import com.yash.fitnesstracker.repository.TokenManager
+import com.yash.fitnesstracker.screens.SplashScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun navigate(navController:NavHostController= rememberNavController(),modifier: Modifier,
+fun Navigate(navController:NavHostController= rememberNavController(),modifier: Modifier,
              appViewModel: appViewModel,loginSignupViewModel: LoginSignupViewModel)
 {
 
@@ -41,8 +39,11 @@ fun navigate(navController:NavHostController= rememberNavController(),modifier: 
     LaunchedEffect(Unit) {
         token = TokenManager.getToken(context)
     }
-    val startDestination = if (token.isNullOrEmpty()) Screens.Login.name else Screens.Home.name
+    val startDestination = Screens.Splash.name
     NavHost(navController=navController, startDestination = startDestination) {
+        composable(Screens.Splash.name) {
+            SplashScreen(navController)
+        }
         composable(route = Screens.Signup.name) {
             SignUp(navController = navController, loginSignupViewModel)
         }
@@ -63,7 +64,7 @@ fun navigate(navController:NavHostController= rememberNavController(),modifier: 
             MonthlyHistory(navController=navController)
         }
         composable(route = Screens.WeeklyHistory.name) {
-            WeeklyHistory(navController=navController)
+            WeeklyHistory(navController=navController,appViewModel)
         }
     }
 }

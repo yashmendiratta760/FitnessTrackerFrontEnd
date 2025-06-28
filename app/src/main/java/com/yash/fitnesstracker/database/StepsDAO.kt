@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.work.Data
 import kotlinx.coroutines.flow.Flow
 import java.sql.Date
 
@@ -29,4 +30,7 @@ interface StepsDAO
 
     @Query("SELECT * FROM Steps_track WHERE date = :date LIMIT 1")
     suspend fun getStepsByDate(date: String): StepsEntities?
+
+    @Query("SELECT * FROM Steps_track")
+    suspend fun getAllData(): List<StepsEntities>?
 }

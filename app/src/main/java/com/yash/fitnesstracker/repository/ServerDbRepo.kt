@@ -7,12 +7,17 @@ import retrofit2.Response
 interface ServerDbRepo
 {
     suspend fun sendSteps(steps: StepsDTO): Response<Unit>
+    suspend fun getAllData(): Response<List<StepsDTO>>
 }
 
 class OnlineServerDbRep(private val serverDbApi: ServerDbApi): ServerDbRepo
 {
     override suspend fun sendSteps(steps: StepsDTO): Response<Unit> {
         return serverDbApi.sendSteps(steps);
+    }
+
+    override suspend fun getAllData():  Response<List<StepsDTO>> {
+        return serverDbApi.getAllData()
     }
 
 }

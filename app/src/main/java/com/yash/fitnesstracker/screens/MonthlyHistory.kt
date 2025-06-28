@@ -1,4 +1,4 @@
-package com.yash.fitnesstracker.Screens
+package com.yash.fitnesstracker.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,15 +11,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.yash.fitnesstracker.Screens.Components.CustomisedTopBar
-import com.yash.fitnesstracker.navigation.Screens
+import com.yash.fitnesstracker.screens.components.CustomisedTopBar
 
 @Composable
-fun WeeklyHistory(navController: NavHostController)
+fun MonthlyHistory(navController: NavHostController)
 {
     Scaffold(
         topBar = {
-            CustomisedTopBar("Weekly History", navController = navController)
+            CustomisedTopBar("Monthly History", navController = navController)
         }
     ) {innerPadding->
         Column(modifier = Modifier.fillMaxSize()

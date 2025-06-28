@@ -1,6 +1,5 @@
 package com.yash.fitnesstracker.Service
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -18,14 +17,11 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.yash.fitnesstracker.MainActivity
 import com.yash.fitnesstracker.R
-import com.yash.fitnesstracker.database.DataStoreManager
 import com.yash.fitnesstracker.repository.StepRepository
-import com.yash.fitnesstracker.viewmodel.AppUiState
+import com.yash.fitnesstracker.utils.StopwatchHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ForegroundService:Service(), SensorEventListener
@@ -95,7 +91,11 @@ class ForegroundService:Service(), SensorEventListener
             notificationManager.createNotificationChannel(channel)
         }
     }
-    private var initialStepCount: Int? = null
+
+    private val stopwatch = StopwatchHelper()
+    private var isStopwatchRunning = false
+    private var lastStepTimestamp = System.currentTimeMillis()
+    private val serviceScope = CoroutineScope(Dispatchers.Default)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onSensorChanged(event: SensorEvent?) {
@@ -103,13 +103,52 @@ class ForegroundService:Service(), SensorEventListener
 
         val stepSinceLastReboot = event.values[0].toInt()
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val midnightBase = DataStoreManager.getMidnightBase(applicationContext)
+        serviceScope.launch {
+            var midnightBase = DataStoreManager.getMidnightBase(applicationContext)
+            if(midnightBase==0)
+            {
+                midnightBase = stepSinceLastReboot
+                DataStoreManager.saveMidnightBase(applicationContext, midnightBase)
+            }
+
+
             val todaySteps = stepSinceLastReboot - midnightBase
 
             StepRepository.updateSteps(todaySteps)
             StepRepository.insertOrUpdateInRoom(todaySteps)
         }
+
+        if (!isStopwatchRunning) {
+            serviceScope.launch {
+                val storedElapsed = DataStoreManager.getTime(applicationContext)
+
+                if (storedElapsed == 0L) {
+                    stopwatch.reset()
+                } else {
+                    stopwatch.setElapsedTime(storedElapsed)
+                }
+                stopwatch.start(serviceScope) { elapsed ->
+                    StepRepository.updateTime(time = (elapsed / 1000) / 60)
+                    serviceScope.launch {
+                        DataStoreManager.saveTime(applicationContext, elapsed)
+                    }
+                    val x = (elapsed / 1000) / 60
+                    Log.d("Stopwatch", "Elapsed: $x)")
+                }
+                isStopwatchRunning = true
+            }
+        }
+
+        lastStepTimestamp = System.currentTimeMillis()
+        serviceScope.launch {
+            delay(10_000)
+            if (System.currentTimeMillis() - lastStepTimestamp >= 10_000 && isStopwatchRunning) {
+                stopwatch.stop()
+                isStopwatchRunning = false
+                Log.d("Stopwatch", "Paused due to inactivity")
+            }
+        }
+
 
     }
 
@@ -122,5 +161,6 @@ class ForegroundService:Service(), SensorEventListener
         // Unregister the sensor listener when service is destroyed
         sensorManager.unregisterListener(this)
     }
+
 
 }

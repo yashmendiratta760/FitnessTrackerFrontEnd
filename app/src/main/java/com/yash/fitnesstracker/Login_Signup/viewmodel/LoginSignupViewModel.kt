@@ -60,7 +60,11 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl) : 
                     _uiState.update { LoginSignupUiState-> LoginSignupUiState.copy(validation_status = 400) }
                     Log.e("otp","otp not validated")
                 }
-                Log.d("Signup","validation successfull")
+                else
+                {
+                    _uiState.value = _uiState.value.copy(isLoggedin = false,
+                        loginAttempted = true)
+                }
             } catch (e: Exception) {
                 Log.e("Error in signup : ",e.toString())
             }
@@ -97,7 +101,7 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl) : 
             }catch (e: Exception){
                 Log.e("Error",e.toString())
 
-                _uiState.value = _uiState.value.copy(isLoggedin = false,
+                _uiState.value = _uiState.value.copy(isLoggedin = true,
                     loginAttempted = true)
             }
         }

@@ -33,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,9 +55,11 @@ import com.yash.fitnesstracker.Login_Signup.data.LoginDTO
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupUiState
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.R
+import com.yash.fitnesstracker.Service.DataStoreManager
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.ui.theme.test
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -66,6 +69,8 @@ fun Login(
     uiState: LoginSignupUiState
 )
 {
+
+    val corountineScope = rememberCoroutineScope()
 
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -107,7 +112,7 @@ fun Login(
                 }
                 Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(context, "Incorrect Credentials", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Login with userName and Password", Toast.LENGTH_SHORT).show()
             }
         }
         LoginSignupViewModel.resetLoginAttepmted(context)
@@ -236,6 +241,10 @@ fun Login(
                             Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
                         } else {
                             LoginSignupViewModel.uiState.value.name = name
+
+                            corountineScope.launch {
+                                DataStoreManager.saveUserName(context,name)
+                            }
                             val user = LoginDTO(name, password)
                             LoginSignupViewModel.Login(context, user)
 

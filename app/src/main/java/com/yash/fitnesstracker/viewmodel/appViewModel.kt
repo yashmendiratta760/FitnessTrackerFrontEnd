@@ -53,6 +53,62 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
         }
     }
 
+    fun getAllStepsFromLocalDb()
+    {
+        viewModelScope.launch {
+            val allStepData = stepsLocalDbRepository.getAllData()
+            val steps = mutableListOf<StepsDTO>()
+            allStepData?.forEach { data->
+                val formattedDate = data.date.format(DateTimeFormatter.ISO_DATE)
+                steps.add(StepsDTO(data.steps.toString(),formattedDate))
+            }
+            _uiState.value = _uiState.value.copy(stepsData = steps)
+
+        }
+
+    }
+
+    fun getAllSteps()
+    {
+        Log.d("ServerFetchSteps","Start")
+        viewModelScope.launch {
+            val response = onlineServerDbRep.getAllData()
+            if (response.isSuccessful) {
+                val stepsData = response.body() ?: emptyList()
+                Log.d("getAllSteps", "Fetched: ${stepsData.size} entries")
+                stepsData.forEach { serverData ->
+                    val localStep = stepsLocalDbRepository.getStepsByDate(serverData.date)
+                    if (localStep == null) {
+                        val formattedDate = serverData.date.format(DateTimeFormatter.ISO_DATE)
+                        insertOrUpdateInRoom(serverData.steps.toInt(), formattedDate)
+                    }
+                }
+            } else {
+                Log.e("getAllSteps", "API failed: ${response.code()} ${response.message()}")
+            }
+
+
+        }
+    }
+
+    suspend fun insertOrUpdateInRoom(steps:Int,formattedDate: String)
+    {
+
+//        val date = LocalDate.now()
+//        val formattedDate = date.format(DateTimeFormatter.ISO_DATE)
+
+        val existingEntity = stepsLocalDbRepository.getStepsByDate(formattedDate)
+        if (existingEntity != null) {
+            // If exists, update the steps
+            val updatedEntity = existingEntity.copy(steps = steps)
+            stepsLocalDbRepository.update(updatedEntity)
+        } else {
+            // If not exists, insert a new entity
+            val newEntity = StepsEntities(steps = steps, date = formattedDate)
+            stepsLocalDbRepository.insert(newEntity)
+        }
+    }
+
 
     fun scheduleDailyStepUpload(context: Context) {
 
@@ -78,46 +134,6 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
     }
 
 
-
-//    fun insertOrUpdateInRoom(steps:Int)
-//    {
-//        viewModelScope.launch {
-//            val date = LocalDate.now()
-//            val formattedDate = date.format(DateTimeFormatter.ISO_DATE)
-//
-//            val existingEntity = stepsLocalDbRepository.getStepsByDate(formattedDate)
-//            if (existingEntity != null) {
-//                // If exists, update the steps
-//                val updatedEntity = existingEntity.copy(steps = steps)
-//                stepsLocalDbRepository.update(updatedEntity)
-//            } else {
-//                // If not exists, insert a new entity
-//                val newEntity = StepsEntities(steps = steps, date = formattedDate)
-//                stepsLocalDbRepository.insert(newEntity)
-//            }
-//
-//        }
-//    }
-
-    fun sendStepsToServerDb(steps:String)
-    {
-        viewModelScope.launch {
-            val date = LocalDate.now()
-            val formattedDate = date.format(DateTimeFormatter.ISO_DATE)
-            val data = StepsDTO(steps,formattedDate)
-
-            val response = onlineServerDbRep.sendSteps(data)
-            if(response.code()==200) {
-                Log.d("ServerDb", "Data Uploaded")
-
-            }
-            else{
-                Log.d("ServerDb","Data upload failed")
-
-            }
-
-        }
-    }
 
     companion object{
         val Factory: ViewModelProvider.Factory= viewModelFactory {

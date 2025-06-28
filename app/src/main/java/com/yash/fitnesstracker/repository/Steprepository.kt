@@ -2,16 +2,11 @@ package com.yash.fitnesstracker.repository
 
 import android.content.Context
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.viewModelScope
-import com.yash.fitnesstracker.API.ServerDbApi
 import com.yash.fitnesstracker.MainApplication
-import com.yash.fitnesstracker.database.StepsDTO
 import com.yash.fitnesstracker.database.StepsEntities
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -25,6 +20,14 @@ object StepRepository {
     }
     private val stepsLocalDbRepository
         get() = appContainer.stepsLocalDbRepository
+
+    private val _time = MutableStateFlow(0L)
+    val timeCount : StateFlow<Long> = _time
+
+    fun updateTime(time: Long)
+    {
+        _time.value = time
+    }
 
 
     private val _stepCount = MutableStateFlow(0)

@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,8 +39,10 @@ import com.yash.fitnesstracker.Login_Signup.Screens.Components.TextBox
 import com.yash.fitnesstracker.Login_Signup.data.userDTO
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.R
+import com.yash.fitnesstracker.Service.DataStoreManager
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.ui.theme.test
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUp(
@@ -50,7 +53,7 @@ fun SignUp(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
-
+    val corountineScope = rememberCoroutineScope()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -191,6 +194,9 @@ fun SignUp(
                             Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
                         } else {
                             LoginSignupViewModel.uiState.value.name = name
+                            corountineScope.launch {
+                                DataStoreManager.saveUserName(context,name)
+                            }
                             val user = userDTO(name, email, password)
                             LoginSignupViewModel.generateOtp(user, context)
                             navController.navigate(Screens.Otp.name)

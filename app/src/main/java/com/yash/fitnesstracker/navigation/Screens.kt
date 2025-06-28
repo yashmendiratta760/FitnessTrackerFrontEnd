@@ -8,5 +8,6 @@ enum class Screens
     Home,
     DailyHistory,
     MonthlyHistory,
-    WeeklyHistory
+    WeeklyHistory,
+    Splash
 }

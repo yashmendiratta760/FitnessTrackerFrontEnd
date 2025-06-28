@@ -8,7 +8,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.yash.fitnesstracker.API.ServerDbApi
 import com.yash.fitnesstracker.MainApplication
-import com.yash.fitnesstracker.database.DataStoreManager
+import com.yash.fitnesstracker.Service.DataStoreManager
 import com.yash.fitnesstracker.database.StepsDTO
 import com.yash.fitnesstracker.repository.OnlineServerDbRep
 import com.yash.fitnesstracker.repository.StepRepository
@@ -30,8 +30,8 @@ class AutoWorkManager(context: Context,workerParameters: WorkerParameters): Coro
         val yesterday = appContainer.stepsLocalDbRepository.getStepsByDate(formattedDate)
 
         val stepsString = yesterday?.steps
-        DataStoreManager.saveMidnightBase(applicationContext,yesterday!!.steps)
-
+        DataStoreManager.saveMidnightBase(applicationContext,0)
+        DataStoreManager.saveTime(applicationContext,0)
         Log.d("AutoWorkManager", "Steps to upload: $stepsString")
 
         val data = StepsDTO(stepsString.toString(),formattedDate)
