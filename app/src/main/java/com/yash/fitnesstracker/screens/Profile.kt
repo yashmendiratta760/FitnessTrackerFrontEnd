@@ -7,20 +7,13 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,25 +24,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import androidx.work.Data
 import coil.compose.AsyncImage
-import com.yash.fitnesstracker.R
-import com.yash.fitnesstracker.Service.DataStoreManager
+import com.yash.fitnesstracker.service.DataStoreManager
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.screens.components.CustomisedTopBar
-import com.yash.fitnesstracker.utils.bg
+import com.yash.fitnesstracker.utils.Bg
 import com.yash.fitnesstracker.viewmodel.AppUiState
 import com.yash.fitnesstracker.viewmodel.UserViewModel
-import com.yash.fitnesstracker.viewmodel.appViewModel
+import com.yash.fitnesstracker.viewmodel.AppViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -65,9 +51,9 @@ import java.io.FileOutputStream
 @Composable
 fun UserProfileScreen(
     navController: NavHostController,
-    isDarkTheme: Boolean = isSystemInDarkTheme(),
+    isDarkTheme: Boolean,
     userViewModel: UserViewModel,
-    appViewModel: appViewModel,
+    appViewModel: AppViewModel,
     appUiState: AppUiState
 ) {
 
@@ -122,8 +108,8 @@ fun UserProfileScreen(
                 }
             )
         }
-    ) {
-        bg()
+    ) { it ->
+        Bg()
 
         Column(
             modifier = Modifier

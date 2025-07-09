@@ -1,18 +1,18 @@
 package com.yash.fitnesstracker.screens.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,12 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun Stopwatch(modifier: Modifier = Modifier,
               onTimeChange: (Long) -> Unit) {
     var isRunning by remember { mutableStateOf(false) }
-    var timeInMillis by remember { mutableStateOf(0L) }
-    var lastTimestamp by remember { mutableStateOf(0L) }
+    var timeInMillis by remember { mutableLongStateOf(0L) }
+    var lastTimestamp by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(isRunning) {
         if (isRunning) {

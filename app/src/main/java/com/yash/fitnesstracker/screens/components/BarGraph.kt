@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,21 +24,19 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import androidx.work.Data
 
 
 @Composable
 fun BarGraph(data:List<Int>,
              labels: List<String>,
              date:List<String>,
-             isDarkTheme: Boolean = isSystemInDarkTheme())
+             isDarkTheme: Boolean)
 {
     val max = data.maxOrNull() ?: 1
     val barRects = remember { mutableStateListOf<Rect>() }
@@ -48,7 +45,7 @@ fun BarGraph(data:List<Int>,
         textSize = 30f
         textAlign = android.graphics.Paint.Align.CENTER
         color = if (isDarkTheme) android.graphics.Color.WHITE else android.graphics.Color.BLACK
-        typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     }
     var selectedBarIndex by remember { mutableStateOf<Int?>(null) }
 
@@ -56,7 +53,7 @@ fun BarGraph(data:List<Int>,
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-        Text(text = "${date.get(0)}  ->  ${date.get(data.size-1)}",
+        Text(text = "${date[0]}  ->  ${date[data.size-1]}",
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,

@@ -3,11 +3,7 @@ package com.yash.fitnesstracker.screens
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.awaitHorizontalDragOrCancellation
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,43 +12,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.yash.fitnesstracker.database.StepsDTO
 import com.yash.fitnesstracker.screens.components.BarGraph
 import com.yash.fitnesstracker.screens.components.CustomisedTopBar
-import com.yash.fitnesstracker.utils.bg
-import com.yash.fitnesstracker.viewmodel.appViewModel
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import java.time.DayOfWeek
+import com.yash.fitnesstracker.utils.Bg
+import com.yash.fitnesstracker.viewmodel.AppUiState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WeeklyHistory(navController: NavHostController,
-                  appViewModel: appViewModel)
+                  isDarkTheme: Boolean,
+                  appUiState: AppUiState)
 {
-    var weekOffset by remember { mutableStateOf(1) }
+    var weekOffset by remember { mutableIntStateOf(1) }
 //    val referenceDate = LocalDate.now().minusWeeks(weekOffset.toLong())
 
-    val appUiState = appViewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
             CustomisedTopBar("Weekly History", navController = navController)
@@ -60,7 +48,7 @@ fun WeeklyHistory(navController: NavHostController,
     ) {innerPadding->
 
         Box {
-            bg()
+            Bg()
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -68,7 +56,7 @@ fun WeeklyHistory(navController: NavHostController,
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                var totalDrag by remember { mutableStateOf(0f) }
+                var totalDrag by remember { mutableFloatStateOf(0f) }
                 val swipeThreshold = with(LocalDensity.current) { 100.dp.toPx() }
 
                 Box(
@@ -84,7 +72,7 @@ fun WeeklyHistory(navController: NavHostController,
                                         val potentialDate =
                                             LocalDate.now().minusWeeks(potentialOffset.toLong())
                                         if (hasDataForWeek(
-                                                appUiState.value.stepsData,
+                                                appUiState.stepsData,
                                                 potentialDate
                                             )
                                         ) {
@@ -119,9 +107,10 @@ fun WeeklyHistory(navController: NavHostController,
                     ) { page ->
                         val referenceDate = LocalDate.now().minusWeeks(page.toLong())
 
-                        makeStepsGraphWeekly(
-                            stepsData = appUiState.value.stepsData,
-                            referenceDate = referenceDate
+                        MakeStepsGraphWeekly(
+                            stepsData = appUiState.stepsData,
+                            referenceDate = referenceDate,
+                            isDarkTheme=isDarkTheme
                         )
                         Log.d(
                             "WEEKLY_DEBUG",
@@ -159,9 +148,10 @@ fun getWeekDates(referenceDate: LocalDate): List<String> {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun makeStepsGraphWeekly(
+fun MakeStepsGraphWeekly(
     stepsData: List<StepsDTO>,
-    referenceDate: LocalDate = LocalDate.now()
+    referenceDate: LocalDate = LocalDate.now(),
+    isDarkTheme: Boolean
 ) {
     val formatter = DateTimeFormatter.ISO_DATE
     val weekDates = getWeekDates(referenceDate)
@@ -177,6 +167,6 @@ fun makeStepsGraphWeekly(
         LocalDate.parse(date, formatter).dayOfWeek.name.take(3)
     }
 
-    BarGraph(labels = labels, data = data,date = dates)
+    BarGraph(labels = labels, data = data,date = dates, isDarkTheme = isDarkTheme)
 }
 

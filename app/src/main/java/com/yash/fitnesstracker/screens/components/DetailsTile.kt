@@ -2,8 +2,6 @@ package com.yash.fitnesstracker.screens.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +36,7 @@ fun DetailsTile(
     cal: Double,
     modifier: Modifier = Modifier,
     icon : ImageVector = Icons.Default.History,
-    isDarkTheme: Boolean = isSystemInDarkTheme(),
+    isDarkTheme: Boolean,
     iconColor:Color = if(isDarkTheme) Color.White else Color.Black
 ) {
     val color by remember { mutableStateOf(
@@ -71,7 +68,7 @@ fun DetailsTile(
                         contentDescription = null,
                         Modifier.size(20.dp))
 
-                    Text(text = " : ${cal}")
+                    Text(text = " : $cal")
                 }
                 Text(
                     text = time,

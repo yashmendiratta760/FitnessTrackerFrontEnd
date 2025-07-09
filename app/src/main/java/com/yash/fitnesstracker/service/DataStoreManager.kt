@@ -1,4 +1,4 @@
-package com.yash.fitnesstracker.Service
+package com.yash.fitnesstracker.service
 
 import android.content.Context
 import android.os.Build
@@ -9,10 +9,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.yash.fitnesstracker.screens.components.pre
 import com.yash.fitnesstracker.viewmodel.UserDataState
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
@@ -83,30 +81,16 @@ object DataStoreManager {
         }
     }
 
-    suspend fun getSteps(context: Context): Int {
-        val prefs = context.dataStore.data.first()
-        return prefs[STEPS_GOAL] ?: 0
-    }
-
     suspend fun saveWeight(context: Context, weight: Double) {
         context.dataStore.edit { prefs ->
             prefs[WEIGHT] = weight
         }
     }
 
-    suspend fun getWeight(context: Context): Double {
-        val prefs = context.dataStore.data.first()
-        return prefs[WEIGHT] ?: 0.0
-    }
     suspend fun saveHeight(context: Context, height: Double) {
         context.dataStore.edit { prefs ->
             prefs[HEIGHT] = height
         }
-    }
-
-    suspend fun getHeight(context: Context): Double {
-        val prefs = context.dataStore.data.first()
-        return prefs[HEIGHT] ?: 0.0
     }
 
     suspend fun saveName(context: Context, name:String) {
@@ -115,20 +99,12 @@ object DataStoreManager {
         }
     }
 
-    suspend fun getName(context: Context): String {
-        val prefs = context.dataStore.data.first()
-        return prefs[NAME] ?: ""
-    }
     suspend fun saveAge(context: Context, age: Int) {
         context.dataStore.edit { prefs ->
             prefs[AGE] = age
         }
     }
 
-    suspend fun getAge(context: Context): Int {
-        val prefs = context.dataStore.data.first()
-        return prefs[AGE] ?: 0
-    }
     suspend fun saveMidnightBase(context: Context, steps: Int) {
         context.dataStore.edit { prefs ->
             prefs[MIDNIGHT_BASE] = steps
@@ -156,12 +132,6 @@ object DataStoreManager {
         context.dataStore.edit { prefs->
             prefs[USER_NAME] = name
         }
-    }
-
-    suspend fun getUserName(context: Context): String
-    {
-        val prefs = context.dataStore.data.first()
-        return prefs[USER_NAME] ?: ""
     }
 
 

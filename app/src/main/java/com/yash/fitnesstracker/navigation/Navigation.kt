@@ -1,16 +1,15 @@
 package com.yash.fitnesstracker.navigation
 
-import android.R.attr.defaultValue
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.AccessibilityNew
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PedalBike
 import androidx.compose.material.icons.filled.SelfImprovement
@@ -20,58 +19,51 @@ import androidx.compose.material.icons.outlined.RunCircle
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.yash.fitnesstracker.Login_Signup.Screens.Login
 import com.yash.fitnesstracker.Login_Signup.Screens.Otp
 import com.yash.fitnesstracker.Login_Signup.Screens.SignUp
 import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
-import com.yash.fitnesstracker.screens.HomeScreen
-import com.yash.fitnesstracker.viewmodel.appViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
-import com.yash.fitnesstracker.screens.DailyHistory
-import com.yash.fitnesstracker.screens.WeeklyHistory
-import com.yash.fitnesstracker.repository.TokenManager
 import com.yash.fitnesstracker.screens.ActivityRunningScreen
 import com.yash.fitnesstracker.screens.ActivityScreen
 import com.yash.fitnesstracker.screens.History
 import com.yash.fitnesstracker.screens.SplashScreen
 import com.yash.fitnesstracker.screens.UserProfileScreen
+import com.yash.fitnesstracker.screens.WeeklyHistory
 import com.yash.fitnesstracker.screens.components.NavigationDrawer
+import com.yash.fitnesstracker.viewmodel.AppViewModel
 import com.yash.fitnesstracker.viewmodel.UserViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun Navigate(navController:NavHostController= rememberNavController(),modifier: Modifier,
-             appViewModel: appViewModel,loginSignupViewModel: LoginSignupViewModel,
-             userViewModel: UserViewModel)
+fun Navigate(modifier: Modifier= Modifier,
+             navController:NavHostController= rememberNavController(),
+             appViewModel: AppViewModel, loginSignupViewModel: LoginSignupViewModel,
+             userViewModel: UserViewModel,
+             isDarkTheme: Boolean = isSystemInDarkTheme()
+)
 
 {
     val userUiState by userViewModel.uiState.collectAsState()
 
-    val uiState by appViewModel.uiState.collectAsState()
+    val appUiState by appViewModel.uiState.collectAsState()
 
     val loginSignupUiState by loginSignupViewModel.uiState.collectAsState()
-    val context = LocalContext.current
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val startDestination = Screens.Splash.name
     NavHost(navController=navController, startDestination = startDestination) {
         composable(Screens.Splash.name) {
             SplashScreen(navController=navController,
-                appViewModel=appViewModel,
-                uiState=uiState)
+                appViewModel=appViewModel)
         }
         composable(route = Screens.Signup.name) {
             SignUp(navController = navController, loginSignupViewModel)
@@ -95,23 +87,14 @@ fun Navigate(navController:NavHostController= rememberNavController(),modifier: 
                     animationSpec = tween(500)
                 )
             }){
-            NavigationDrawer(appViewModel,loginSignupViewModel,userViewModel,navController,drawerState,uiState,
-                userUiState = userUiState)
-        }
-        composable(route = Screens.DailyHistory.name,enterTransition = {
-            slideInHorizontally(
-                initialOffsetX = { fullWidth -> fullWidth },
-                animationSpec = tween(500)
-            )
-        },
-            popExitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { fullWidth -> fullWidth },
-                    animationSpec = tween(500)
-                )
-            }
-            ) {
-            DailyHistory(navController=navController)
+            NavigationDrawer(appViewModel=appViewModel,
+                loginSignupViewModel=loginSignupViewModel,
+                userViewModel=userViewModel,
+                navController=navController,
+                drawerState=drawerState,
+                appUiState = appUiState,
+                userUiState = userUiState,
+                isDarkTheme=isDarkTheme)
         }
 
         composable(route = Screens.Profile.name,enterTransition = {
@@ -127,7 +110,11 @@ fun Navigate(navController:NavHostController= rememberNavController(),modifier: 
                 )
             }
         ) {
-            UserProfileScreen(navController=navController, userViewModel = userViewModel, appViewModel = appViewModel, appUiState = uiState)
+            UserProfileScreen(navController=navController,
+                userViewModel = userViewModel,
+                appViewModel = appViewModel,
+                appUiState = appUiState,
+                isDarkTheme = isDarkTheme)
         }
 
         composable(route = Screens.Activity.name,
@@ -144,7 +131,8 @@ fun Navigate(navController:NavHostController= rememberNavController(),modifier: 
                 )
             }
         ) {
-            ActivityScreen(navController=navController)
+            ActivityScreen(navController=navController,
+                isDarkTheme=isDarkTheme)
 
         }
 
@@ -164,7 +152,8 @@ fun Navigate(navController:NavHostController= rememberNavController(),modifier: 
         {
 
             History(navController=navController,
-                uiState = uiState)
+                uiState = appUiState,
+                isDarkTheme=isDarkTheme)
         }
 
 
@@ -192,13 +181,13 @@ fun Navigate(navController:NavHostController= rememberNavController(),modifier: 
                 )
             })
         {backStackEntry->
-            val ScreenName = backStackEntry.arguments?.getString("ScreenName") ?: "None"
-            val Met = backStackEntry.arguments?.getString("Met")?.toDoubleOrNull() ?: 0.0
-            val icon = when (ScreenName) {
+            val screenName = backStackEntry.arguments?.getString("ScreenName") ?: "None"
+            val met = backStackEntry.arguments?.getString("Met")?.toDoubleOrNull() ?: 0.0
+            val icon = when (screenName) {
                 "Running" -> Icons.Outlined.RunCircle
-                "Cycling(Outdoor)" -> Icons.Default.DirectionsBike
+                "Cycling(Outdoor)" -> Icons.AutoMirrored.Filled.DirectionsBike
                 "Cycling(Indoor)" -> Icons.Default.PedalBike
-                "Treadmill" -> Icons.Default.DirectionsRun
+                "Treadmill" -> Icons.AutoMirrored.Filled.DirectionsRun
                 "Jump Rope" -> Icons.Default.SportsGymnastics
                 "Swimming" -> Icons.Default.Water
                 "Dancing" -> Icons.Default.SelfImprovement
@@ -209,8 +198,9 @@ fun Navigate(navController:NavHostController= rememberNavController(),modifier: 
             }
 
             ActivityRunningScreen(navController = navController,
-                screenName = ScreenName,icon = icon,Met = Met,
-                appViewModel = appViewModel)
+                screenName = screenName,icon = icon,met = met,
+                appViewModel = appViewModel,
+                userDataState = userUiState)
         }
         composable(route = Screens.WeeklyHistory.name,
             enterTransition = {
@@ -225,7 +215,9 @@ fun Navigate(navController:NavHostController= rememberNavController(),modifier: 
                     animationSpec = tween(500)
                 )
             }) {
-            WeeklyHistory(navController=navController,appViewModel)
+            WeeklyHistory(navController=navController,
+                appUiState = appUiState,
+                isDarkTheme = isDarkTheme)
         }
     }
 }

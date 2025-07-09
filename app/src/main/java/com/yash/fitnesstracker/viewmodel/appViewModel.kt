@@ -12,14 +12,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.yash.fitnesstracker.MainApplication
-import com.yash.fitnesstracker.Service.AutoWorkManager
-import com.yash.fitnesstracker.Service.DataStoreManager
+import com.yash.fitnesstracker.service.AutoWorkManager
+import com.yash.fitnesstracker.service.DataStoreManager
 import com.yash.fitnesstracker.database.ActivityDTO
 import com.yash.fitnesstracker.database.ActivityHistoryEntities
 import com.yash.fitnesstracker.database.StepsDTO
@@ -37,15 +34,13 @@ import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
+class AppViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
     private val onlineServerDbRep: OnlineServerDbRep,
     private val activityHistoryRepo: ActivityHistoryRepo): ViewModel()
 {
@@ -232,7 +227,7 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
                 val repository = application.container.stepsLocalDbRepository
                 val repositoryServerDb = application.container.onlineServerDbRep
                 val activityHistoryRepo = application.container.activityHistoryRepo
-                appViewModel(repository,repositoryServerDb,
+                AppViewModel(repository,repositoryServerDb,
                     activityHistoryRepo)
             }
         }

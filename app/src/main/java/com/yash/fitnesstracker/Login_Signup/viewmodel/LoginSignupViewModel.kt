@@ -1,6 +1,5 @@
 package com.yash.fitnesstracker.Login_Signup.viewmodel
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -12,15 +11,12 @@ import com.yash.fitnesstracker.MainApplication
 import com.yash.fitnesstracker.Login_Signup.repository.LoginSignupRepositoryImpl
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.yash.fitnesstracker.Login_Signup.data.LoginDTO
 import com.yash.fitnesstracker.Login_Signup.data.otpValidateData
 import com.yash.fitnesstracker.Login_Signup.data.userDTO
-import com.yash.fitnesstracker.Service.DataStoreManager
-import com.yash.fitnesstracker.repository.OfflineStepsLocalDbRepository
+import com.yash.fitnesstracker.service.DataStoreManager
 import com.yash.fitnesstracker.repository.StepsLocalDbRepository
 import com.yash.fitnesstracker.repository.TokenManager
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

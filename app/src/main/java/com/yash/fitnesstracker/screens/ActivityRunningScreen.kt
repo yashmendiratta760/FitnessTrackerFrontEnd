@@ -1,5 +1,6 @@
 package com.yash.fitnesstracker.screens
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -22,16 +23,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -48,29 +46,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.yash.fitnesstracker.R
-import com.yash.fitnesstracker.database.Activities
 import com.yash.fitnesstracker.database.ActivityDTO
-import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.screens.components.Stopwatch
-import com.yash.fitnesstracker.viewmodel.appViewModel
+import com.yash.fitnesstracker.viewmodel.UserDataState
+import com.yash.fitnesstracker.viewmodel.AppViewModel
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
 
 //@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@SuppressLint("DefaultLocale")
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ActivityRunningScreen(navController: NavHostController,
-                          appViewModel: appViewModel,
+                          appViewModel: AppViewModel,
                           screenName: String,
-                          icon: ImageVector,Met: Double)
+                          icon: ImageVector,met: Double,
+                          userDataState: UserDataState)
 {
 
-    val uiState = appViewModel.uiState.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
-    var timeInMillis by remember { mutableStateOf(0L) }
+    var timeInMillis by remember { mutableLongStateOf(0L) }
     val formattedTime = remember(timeInMillis) {
         val totalSeconds = timeInMillis / 1000
         val hours = totalSeconds / 3600
@@ -80,7 +78,7 @@ fun ActivityRunningScreen(navController: NavHostController,
     }
 
     val sec = (timeInMillis / 1000 ).toInt()
-    val calories = calBurned(Met, BW = 80.0,sec = sec)
+    val calories = calBurned(met, bw = userDataState.weight.toDouble(),sec = sec)
 
     val infiniteTransition = rememberInfiniteTransition(label = "gradient")
 
@@ -222,7 +220,7 @@ fun ActivityRunningScreen(navController: NavHostController,
     Box(modifier = Modifier
         .fillMaxWidth()
         .padding(top = 50.dp, start = 20.dp)) {
-        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Arrow Back",
+        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back",
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .clickable(
@@ -234,7 +232,7 @@ fun ActivityRunningScreen(navController: NavHostController,
 
 }
 
-private fun calBurned(Met: Double, BW: Double, sec:Int): Double
+private fun calBurned(met: Double, bw: Double, sec:Int): Double
 {
-    return Met*BW*(sec/3600.0)
+    return met*bw*(sec/3600.0)
 }

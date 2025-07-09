@@ -1,4 +1,4 @@
-package com.yash.fitnesstracker.Service
+package com.yash.fitnesstracker.service
 
 import android.content.Context
 import android.os.Build
@@ -6,14 +6,9 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.yash.fitnesstracker.API.ServerDbApi
 import com.yash.fitnesstracker.MainApplication
-import com.yash.fitnesstracker.Service.DataStoreManager
 import com.yash.fitnesstracker.database.StepsDTO
-import com.yash.fitnesstracker.repository.OnlineServerDbRep
 import com.yash.fitnesstracker.repository.StepRepository
-import com.yash.fitnesstracker.viewmodel.AppUiState
-import com.yash.fitnesstracker.viewmodel.appViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
