@@ -1,4 +1,4 @@
-package com.yash.fitnesstracker.Login_Signup.viewmodel
+package com.yash.fitnesstracker.login_Signup.viewmodel
 
 import android.content.Context
 import android.util.Log
@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.yash.fitnesstracker.MainApplication
-import com.yash.fitnesstracker.Login_Signup.repository.LoginSignupRepositoryImpl
+import com.yash.fitnesstracker.login_Signup.repository.LoginSignupRepositoryImpl
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import com.yash.fitnesstracker.Login_Signup.data.LoginDTO
-import com.yash.fitnesstracker.Login_Signup.data.otpValidateData
-import com.yash.fitnesstracker.Login_Signup.data.userDTO
+import com.yash.fitnesstracker.login_Signup.data.LoginDTO
+import com.yash.fitnesstracker.login_Signup.data.OtpValidateData
+import com.yash.fitnesstracker.login_Signup.data.UserDTO
 import com.yash.fitnesstracker.service.DataStoreManager
 import com.yash.fitnesstracker.repository.StepsLocalDbRepository
 import com.yash.fitnesstracker.repository.TokenManager
@@ -29,22 +29,22 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
     private val _uiState = MutableStateFlow(LoginSignupUiState())
     val uiState:StateFlow<LoginSignupUiState> = _uiState.asStateFlow()
 
-    fun generateOtp(userDto: userDTO, context: Context)
+    fun generateOtp(userDTO: UserDTO, context: Context)
     {
         viewModelScope.launch {
             try {
-                val otp = repository.generateOtp(userDto)
+                val otp = repository.generateOtp(userDTO)
                 if(otp.code()==409)
                 {
                     Toast.makeText(context, "Username already exists", Toast.LENGTH_SHORT).show()
                 }
                 else {
 
-                    DataStoreManager.saveUserName(context, userDto.userName)
+                    DataStoreManager.saveUserName(context, userDTO.userName)
 
-                    _uiState.update { LoginSignupUiState ->
-                        LoginSignupUiState.copy(
-                            email = userDto.email,
+                    _uiState.update { loginSignupUiState ->
+                        loginSignupUiState.copy(
+                            email = userDTO.email,
                             otp = otp.body() ?: "",
                             isOtpGenerated = true
                         )
@@ -60,14 +60,14 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
 
     fun resetValidationStatus()
     {
-        _uiState.value.copy(validation_status = 0)
+        _uiState.value.copy(validationStatus = 0)
     }
 
     fun resetOtpFlag() {
         _uiState.update { it.copy(isOtpGenerated = false) }
     }
 
-    fun Signup(validate: otpValidateData,context: Context)
+    fun signup(validate: OtpValidateData,context: Context)
     {
 
         viewModelScope.launch {
@@ -75,7 +75,7 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
                 val response = repository.signup(validate)
                 if(response.code()==400)
                 {
-                    _uiState.update { LoginSignupUiState-> LoginSignupUiState.copy(validation_status = 400) }
+                    _uiState.update { loginSignupUiState-> loginSignupUiState.copy(validationStatus = 400) }
                     Log.e("otp","otp not validated")
                 }
                 else if(response.code()==200)
@@ -87,7 +87,7 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
 
                     _uiState.value = _uiState.value.copy(isLoggedin = true,
                         loginAttempted = true,
-                        validation_status = 200)
+                        validationStatus = 200)
                 }
             } catch (e: Exception) {
                 Log.e("Error in signup : ",e.toString())
@@ -96,7 +96,7 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
 
     }
 
-    fun Login(context: Context,loginDTO: LoginDTO)
+    fun login(context: Context,loginDTO: LoginDTO)
     {
         viewModelScope.launch {
 
@@ -149,7 +149,7 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
         }
     }
 
-    fun resetLoginAttepmted(context: Context)
+    fun resetLoginAttepmted()
     {
         _uiState.value = _uiState.value.copy(loginAttempted = false)
     }
@@ -160,9 +160,9 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application =(this[APPLICATION_KEY] as MainApplication)
-                val LoginSignupRepository = application.container.loginSignupRepository
+                val loginSignupRepository = application.container.loginSignupRepository
                 val stepsLocalDbRepository = application.container.stepsLocalDbRepository
-                LoginSignupViewModel(LoginSignupRepository,stepsLocalDbRepository)
+                LoginSignupViewModel(loginSignupRepository,stepsLocalDbRepository)
             }
         }
     }

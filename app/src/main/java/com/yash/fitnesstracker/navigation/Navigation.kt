@@ -28,10 +28,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.yash.fitnesstracker.Login_Signup.Screens.Login
-import com.yash.fitnesstracker.Login_Signup.Screens.Otp
-import com.yash.fitnesstracker.Login_Signup.Screens.SignUp
-import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
+import com.yash.fitnesstracker.login_Signup.screens.Login
+import com.yash.fitnesstracker.login_Signup.screens.Otp
+import com.yash.fitnesstracker.login_Signup.screens.SignUp
+import com.yash.fitnesstracker.login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.screens.ActivityRunningScreen
 import com.yash.fitnesstracker.screens.ActivityScreen
 import com.yash.fitnesstracker.screens.History

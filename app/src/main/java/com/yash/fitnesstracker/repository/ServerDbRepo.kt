@@ -1,7 +1,7 @@
 package com.yash.fitnesstracker.repository
 
-import com.yash.fitnesstracker.API.ServerDbApi
-import com.yash.fitnesstracker.API.UploadResponse
+import com.yash.fitnesstracker.api.ServerDbApi
+import com.yash.fitnesstracker.api.UploadResponse
 import com.yash.fitnesstracker.database.StepsDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

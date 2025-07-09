@@ -1,9 +1,8 @@
-package com.yash.fitnesstracker.API
+package com.yash.fitnesstracker.api
 
 import com.yash.fitnesstracker.database.StepsDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

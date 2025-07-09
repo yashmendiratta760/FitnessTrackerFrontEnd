@@ -1,9 +1,9 @@
 package com.yash.fitnesstracker.database
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsRun
 import androidx.compose.material.icons.filled.AccessibilityNew
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PedalBike
 import androidx.compose.material.icons.filled.SelfImprovement
@@ -15,16 +15,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 data class Activity(
     val name:String,
-    val MET:Double,
+    val met:Double,
     val icon: ImageVector = Icons.Default.FitnessCenter,
     val color : Color = Color(0xFF2EC4B6)
 )
 
 val Activities = listOf(
     Activity("Running",7.0, Icons.Outlined.RunCircle),
-    Activity("Cycling(Outdoor)",6.0,Icons.Default.DirectionsBike),
+    Activity("Cycling(Outdoor)",6.0, Icons.AutoMirrored.Filled.DirectionsBike),
     Activity("Cycling(Indoor)",6.8,Icons.Default.PedalBike),
-    Activity("Treadmill",6.0,Icons.Default.DirectionsRun),
+    Activity("Treadmill",6.0, Icons.AutoMirrored.Filled.DirectionsRun),
     Activity("Jump Rope",10.0,Icons.Default.SportsGymnastics),
     Activity("Swimming",9.5,Icons.Default.Water),
     Activity("Dancing",6.0,Icons.Default.SelfImprovement),

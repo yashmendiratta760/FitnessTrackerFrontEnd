@@ -1,9 +1,9 @@
 package com.yash.fitnesstracker.repository
 
 import android.content.Context
-import com.yash.fitnesstracker.API.ServerDbApi
-import com.yash.fitnesstracker.Login_Signup.API.LoginSignupAPI
-import com.yash.fitnesstracker.Login_Signup.repository.LoginSignupRepositoryImpl
+import com.yash.fitnesstracker.api.ServerDbApi
+import com.yash.fitnesstracker.login_Signup.api.LoginSignupAPI
+import com.yash.fitnesstracker.login_Signup.repository.LoginSignupRepositoryImpl
 import com.yash.fitnesstracker.config.AuthInterceptor
 import com.yash.fitnesstracker.database.ActivityDatabase
 import com.yash.fitnesstracker.database.StepsDatabase

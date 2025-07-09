@@ -1,14 +1,11 @@
 package com.yash.fitnesstracker.database
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import androidx.work.Data
 import kotlinx.coroutines.flow.Flow
-import java.sql.Date
 
 @Dao
 interface StepsDAO

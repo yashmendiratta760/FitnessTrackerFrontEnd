@@ -6,7 +6,6 @@ enum class Screens
     Login,
     Otp,
     Home,
-    DailyHistory,
     Activity,
     WeeklyHistory,
     Splash,

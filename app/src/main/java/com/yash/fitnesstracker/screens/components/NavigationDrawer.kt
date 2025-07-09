@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
+import com.yash.fitnesstracker.login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.screens.HomeScreen
 import com.yash.fitnesstracker.viewmodel.AppUiState

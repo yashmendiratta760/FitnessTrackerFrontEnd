@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
+import com.yash.fitnesstracker.login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.service.DataStoreManager
 import com.yash.fitnesstracker.navigation.Navigate
 import com.yash.fitnesstracker.ui.theme.FitnessTrackerTheme

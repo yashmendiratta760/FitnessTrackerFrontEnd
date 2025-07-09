@@ -1,9 +1,8 @@
-package com.yash.fitnesstracker.Login_Signup.Screens
+package com.yash.fitnesstracker.login_Signup.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,21 +27,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.yash.fitnesstracker.Login_Signup.Screens.Components.OtpInput
-import com.yash.fitnesstracker.Login_Signup.data.otpValidateData
-import com.yash.fitnesstracker.Login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.R
+import com.yash.fitnesstracker.login_Signup.data.OtpValidateData
+import com.yash.fitnesstracker.login_Signup.screens.components.OtpInput
+import com.yash.fitnesstracker.login_Signup.viewmodel.LoginSignupUiState
+import com.yash.fitnesstracker.login_Signup.viewmodel.LoginSignupViewModel
 import com.yash.fitnesstracker.navigation.Screens
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun Otp(LoginSignupViewModel: LoginSignupViewModel,
-        navController: NavHostController) {
-
-    val uiState by LoginSignupViewModel.uiState.collectAsState()
+fun Otp(loginSignupViewModel: LoginSignupViewModel,
+        navController: NavHostController,
+        loginSignupUiState: LoginSignupUiState) {
+    
     val context = LocalContext.current
 
     var otpe by remember { mutableStateOf("") }
@@ -99,9 +96,8 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
 
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        val data = otpValidateData(email = uiState.email, otp = otpe)
-                        LoginSignupViewModel.Signup(data,context)
+                    coroutineScope.launch { val data = OtpValidateData(email = loginSignupUiState.email, otp = otpe)
+                        loginSignupViewModel.signup(data,context)
 
 
 
@@ -115,15 +111,15 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
                 Text(text = "Verify")
             }
 
-            LaunchedEffect(uiState.validation_status) {
-                when (uiState.validation_status) {
+            LaunchedEffect(loginSignupUiState.validationStatus) {
+                when (loginSignupUiState.validationStatus) {
                     400 -> {
                         Toast.makeText(context, "Enter correct OTP", Toast.LENGTH_SHORT).show()
-                        LoginSignupViewModel.resetValidationStatus()
+                        loginSignupViewModel.resetValidationStatus()
                     }
                     200 -> {
                         Toast.makeText(context, "Signup successful.", Toast.LENGTH_SHORT).show()
-                        LoginSignupViewModel.resetValidationStatus()
+                        loginSignupViewModel.resetValidationStatus()
                         navController.navigate(Screens.Profile.name) {
                             popUpTo(0) { inclusive = true }
                         }
