@@ -111,12 +111,14 @@ fun Login(
                     popUpTo(0) { inclusive = true }
                 }
                 Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
-            } else {
+            } else if (uiState.loginTriggered) {
                 Toast.makeText(context, "Login with userName and Password", Toast.LENGTH_SHORT).show()
             }
         }
         LoginSignupViewModel.resetLoginAttepmted(context)
     }
+
+
 
 
     Box(

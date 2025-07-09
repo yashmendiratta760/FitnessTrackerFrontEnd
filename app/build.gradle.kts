@@ -82,4 +82,13 @@ dependencies {
 
 
     implementation(libs.androidx.work.runtime.ktx)
+
+    implementation(libs.androidx.material.icons.extended)
+
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
+    implementation(libs.coil.compose)
+    implementation(libs.converter.scalars)
+
 }

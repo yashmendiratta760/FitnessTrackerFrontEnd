@@ -1,10 +1,11 @@
 package com.yash.fitnesstracker.screens.components
 
-import android.graphics.drawable.Icon
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,10 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.Pause
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,18 +26,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.yash.fitnesstracker.R
 
 @Composable
-fun CustomizedButton(
+fun DetailsTile(
     text: String,
-    onClick: () -> Unit,
+    time: String,
+    cal: Double,
     modifier: Modifier = Modifier,
     icon : ImageVector = Icons.Default.History,
     isDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -56,13 +52,10 @@ fun CustomizedButton(
             .height(70.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(color.copy(alpha = 0.6f))
-
-
-            .clickable { onClick() }
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(imageVector = icon,
                 contentDescription = text,
                 tint = iconColor)
@@ -72,40 +65,19 @@ fun CustomizedButton(
                 style = MaterialTheme.typography.bodyLarge
             )
             Spacer(modifier= Modifier.weight(1f))
-            Icon(imageVector = Icons.Default.ArrowForward,
-                contentDescription = "forward arrow")
-        }
-    }
-}
+            Column {
+                Row {
+                    Image(painter = painterResource(R.drawable.pngtreefueguito_png_6502196),
+                        contentDescription = null,
+                        Modifier.size(20.dp))
 
-@Preview(showSystemUi = true)
-@Composable
-fun CircleButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {},
-    started: Boolean = false
-) {
-    Box(
-        modifier = modifier
-            .size(150.dp)
-            .clip(RoundedCornerShape(100.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color(0xFF86EBF1),
-                        Color(0xFF0A55C2),
-                        Color(0xF0076974),
-                        Color(0xFF1281AF)
-                    )
+                    Text(text = " : ${cal}")
+                }
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.bodyLarge
                 )
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(imageVector = if(!started)Icons.Outlined.PlayArrow else Icons.Outlined.Pause,
-            contentDescription = null,
-            modifier = Modifier.size(80.dp),
-            tint = Color(0xFF91E5FA),
-            )
+            }
+        }
     }
 }

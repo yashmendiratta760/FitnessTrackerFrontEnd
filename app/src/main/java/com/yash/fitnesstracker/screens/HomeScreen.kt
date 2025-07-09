@@ -11,6 +11,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DirectionsRun
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +52,7 @@ import com.yash.fitnesstracker.screens.components.CustomizedButton
 import com.yash.fitnesstracker.Service. ForegroundService
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.utils.bg
+import com.yash.fitnesstracker.viewmodel.UserViewModel
 import com.yash.fitnesstracker.viewmodel.appViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -60,20 +67,30 @@ import java.text.DecimalFormat
 @Composable
 fun HomeScreen(modifier: Modifier= Modifier,
                appViewModel: appViewModel,
-               loginSignupViewModel: LoginSignupViewModel,
+               userViewModel: UserViewModel,
                navController: NavHostController,
+               drawerState: DrawerState,
                isDarkTheme: Boolean = isSystemInDarkTheme())
 {
 
     val context = LocalContext.current
-
-    var showDetail = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val showDetail = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        appViewModel.getAllSteps()
+        appViewModel.syncStepsOncePerDay()
+
     }
 //    LaunchedEffect(Unit) {
 //        simulateMidnightBase(context,26880)
+//    }
+
+
+
+//    LaunchedEffect(showDetail.value) {
+//        if (showDetail.value) {
+//            drawerState.open()
+//        }
 //    }
     LaunchedEffect(Unit) {
         val intent = Intent(context, ForegroundService::class.java)
@@ -87,8 +104,17 @@ fun HomeScreen(modifier: Modifier= Modifier,
 
     val steps = appViewModel.uiState.collectAsState().value.steps
     Log.d("UI", "Steps from ViewModel: $steps")
-    val progress = steps / 10000f
+    val userUiState = userViewModel.uiState.collectAsState()
+    val stepsGoal = userUiState.value.stepsGoal
+    val progress = steps / stepsGoal.toFloat()
     val time by remember { mutableStateOf(0)}
+
+    LaunchedEffect(steps) {
+        if(steps<0)
+        {
+            DataStoreManager.saveMidnightBase(context,0)
+        }
+    }
 
 
     Box {
@@ -97,41 +123,24 @@ fun HomeScreen(modifier: Modifier= Modifier,
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 50.dp, end = 30.dp), horizontalArrangement = Arrangement.End
+                    .padding(top = 50.dp, end = 30.dp), horizontalArrangement = Arrangement.Start
             ) {
                 Box(
                     modifier = modifier
-                        .size(45.dp)
+                        .padding(start = 16.dp)
                         .clip(
                             RoundedCornerShape(30.dp)
                         )
-                        .background(color = Color.Black)
-                        .clickable(onClick = { showDetail.value = true }),
-                    contentAlignment = Alignment.Center
+
+                        .clickable(onClick = { coroutineScope.launch {
+                            if(drawerState.isClosed) drawerState.open()
+                        }}),
+                    contentAlignment = Alignment.TopStart
                 ) {
-                    val name by produceState(initialValue = "") {
-                        value = DataStoreManager.getUserName(context)
-                    }
-                    val firstLetter =
-                        name.firstOrNull { it.isLetter() }?.uppercaseChar()?.toString() ?: ""
-                    Text(
-                        text = firstLetter,
-                        fontSize = 20.sp, fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    Icon(imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu",
+                        modifier= Modifier.size(25.dp))
                 }
-            }
-            if (showDetail.value) {
-                DialogueBoxOpt(
-                    showDetail,
-                    onLogoutClick = {
-                        showDetail.value = false
-                        loginSignupViewModel.logout(context) {
-                            navController.navigate(Screens.Login.name) {
-                                popUpTo(0) { inclusive = true }
-                            }
-                        }
-                    })
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -194,15 +203,15 @@ fun HomeScreen(modifier: Modifier= Modifier,
                 }
                 item {
                     Column {
-                        CustomizedButton(
-                            text = "Daily History", onClick = {
-                                navController.navigate(Screens.DailyHistory.name)
-                            },
-                            modifier = Modifier.padding(
-                                top = 26.dp, start = 16.dp,
-                                end = 16.dp
-                            )
-                        )
+//                        CustomizedButton(
+//                            text = "Daily History", onClick = {
+//                                navController.navigate(Screens.DailyHistory.name)
+//                            },
+//                            modifier = Modifier.padding(
+//                                top = 26.dp, start = 16.dp,
+//                                end = 16.dp
+//                            )
+//                        )
                         CustomizedButton(
                             text = "Weekly History", onClick = {
                                 appViewModel.getAllStepsFromLocalDb()
@@ -214,9 +223,11 @@ fun HomeScreen(modifier: Modifier= Modifier,
                             )
                         )
                         CustomizedButton(
-                            text = "Monthly History", onClick = {
-                                navController.navigate(Screens.MonthlyHistory.name)
+                            text = "Activity", onClick = {
+                                navController.navigate(Screens.Activity.name)
                             },
+                            iconColor = Color.Green,
+                            icon = Icons.Default.DirectionsRun,
                             modifier = Modifier.padding(
                                 top = 16.dp, start = 16.dp,
                                 end = 16.dp

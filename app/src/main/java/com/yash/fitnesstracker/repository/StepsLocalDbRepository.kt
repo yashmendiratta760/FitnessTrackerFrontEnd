@@ -13,6 +13,7 @@ interface StepsLocalDbRepository
     suspend fun fetchByDate(date: String): Flow<List<StepsEntities>>
     suspend fun getStepsByDate(date: String): StepsEntities?
     suspend fun getAllData(): List<StepsEntities>?
+    suspend fun clearAllData()
 
 
 }
@@ -41,6 +42,10 @@ class OfflineStepsLocalDbRepository(private val stepsDAO: StepsDAO): StepsLocalD
 
     override suspend fun getAllData(): List<StepsEntities>? {
         return stepsDAO.getAllData()
+    }
+
+    override suspend fun clearAllData() {
+        stepsDAO.deleteAllData()
     }
 
 

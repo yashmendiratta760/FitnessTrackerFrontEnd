@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,18 +101,11 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
                 onClick = {
                     coroutineScope.launch {
                         val data = otpValidateData(email = uiState.email, otp = otpe)
-                        LoginSignupViewModel.Signup(data)
+                        LoginSignupViewModel.Signup(data,context)
 
-                        delay(500)
 
-                        if (LoginSignupViewModel.uiState.value.validation_status == 400) {
-                            Toast.makeText(context, "Enter correct OTP", Toast.LENGTH_SHORT).show()
-                        } else {
-                            navController.navigate(Screens.Login.name) {
-                                popUpTo(0) { inclusive = true }
-                            }
-                            Toast.makeText(context, "Signup successful. Please login.", Toast.LENGTH_SHORT).show()
-                        }
+
+
                     }
                 },
                 modifier = Modifier
@@ -120,6 +114,23 @@ fun Otp(LoginSignupViewModel: LoginSignupViewModel,
             ) {
                 Text(text = "Verify")
             }
+
+            LaunchedEffect(uiState.validation_status) {
+                when (uiState.validation_status) {
+                    400 -> {
+                        Toast.makeText(context, "Enter correct OTP", Toast.LENGTH_SHORT).show()
+                        LoginSignupViewModel.resetValidationStatus()
+                    }
+                    200 -> {
+                        Toast.makeText(context, "Signup successful.", Toast.LENGTH_SHORT).show()
+                        LoginSignupViewModel.resetValidationStatus()
+                        navController.navigate(Screens.Profile.name) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

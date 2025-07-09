@@ -33,4 +33,7 @@ interface StepsDAO
 
     @Query("SELECT * FROM Steps_track")
     suspend fun getAllData(): List<StepsEntities>?
+
+    @Query("DELETE FROM Steps_track")
+    suspend fun deleteAllData()
 }

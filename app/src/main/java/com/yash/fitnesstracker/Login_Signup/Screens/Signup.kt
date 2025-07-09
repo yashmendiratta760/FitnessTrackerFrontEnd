@@ -17,6 +17,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +56,14 @@ fun SignUp(
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     val corountineScope = rememberCoroutineScope()
+
+    val uiState = LoginSignupViewModel.uiState.collectAsState()
+    LaunchedEffect(uiState.value.isOtpGenerated) {
+        if (uiState.value.isOtpGenerated) {
+            navController.navigate(Screens.Otp.name)
+            LoginSignupViewModel.resetOtpFlag()
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -194,12 +204,10 @@ fun SignUp(
                             Toast.makeText(context, "Fill all fields", Toast.LENGTH_SHORT).show()
                         } else {
                             LoginSignupViewModel.uiState.value.name = name
-                            corountineScope.launch {
-                                DataStoreManager.saveUserName(context,name)
-                            }
+
                             val user = userDTO(name, email, password)
                             LoginSignupViewModel.generateOtp(user, context)
-                            navController.navigate(Screens.Otp.name)
+
                         }
                     },
                     modifier = Modifier

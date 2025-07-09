@@ -6,5 +6,8 @@ data class LoginSignupUiState(
     var validation_status: Int = 0,
     var isLoggedin: Boolean = false,
     var loginAttempted: Boolean = false,
-    var name:String="Fitness"
+    var name:String="Fitness",
+    val isOtpGenerated: Boolean = false,
+    val loginTriggered: Boolean = false
+
 )

@@ -1,21 +1,134 @@
 package com.yash.fitnesstracker.Service
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.yash.fitnesstracker.screens.components.pre
+import com.yash.fitnesstracker.viewmodel.UserDataState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object DataStoreManager {
     private val Context.dataStore by preferencesDataStore(name = "step_data")
 
+    private lateinit var appContext: Context
+
+    fun init(context: Context) {
+        appContext = context.applicationContext
+    }
+
     private val MIDNIGHT_BASE = intPreferencesKey("midnight_base")
     private val USER_NAME = stringPreferencesKey("user_name")
     private val TIME = longPreferencesKey("time")
+    private val NAME = stringPreferencesKey("name")
+    private val AGE = intPreferencesKey("age")
+    private val WEIGHT = doublePreferencesKey("weight")
+    private val HEIGHT = doublePreferencesKey("height")
+    private val STEPS_GOAL = intPreferencesKey("stepsGoal")
+    private val LAST_SYNC_DATE = stringPreferencesKey("lastSyncDate")
 
+
+    suspend fun getLastSyncDate(): String? {
+        val preferences = appContext.dataStore.data.first()
+        return preferences[LAST_SYNC_DATE]
+    }
+
+    suspend fun setLastSyncDate(date: String) {
+        appContext.dataStore.edit { prefs ->
+            prefs[LAST_SYNC_DATE] = date
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun isToday(date: String?): Boolean {
+        val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+        return date == today
+    }
+
+
+    suspend fun clearAllData()
+    {
+        appContext.dataStore.edit { prefs->
+            prefs.clear()
+        }
+    }
+
+    fun getUserData(): Flow<UserDataState>
+    {
+        return appContext.dataStore.data.map { prefs->
+            UserDataState(
+                name = prefs[NAME] ?: "",
+                age = (prefs[AGE] ?: 0).toString(),
+                weight = (prefs[WEIGHT] ?: 0.0).toString(),
+                height = (prefs[HEIGHT] ?: 0.0).toString(),
+                stepsGoal = (prefs[STEPS_GOAL] ?: 0).toString()
+            )
+        }
+    }
+
+
+    suspend fun saveSteps(context: Context, stepsGoal: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[STEPS_GOAL] = stepsGoal
+        }
+    }
+
+    suspend fun getSteps(context: Context): Int {
+        val prefs = context.dataStore.data.first()
+        return prefs[STEPS_GOAL] ?: 0
+    }
+
+    suspend fun saveWeight(context: Context, weight: Double) {
+        context.dataStore.edit { prefs ->
+            prefs[WEIGHT] = weight
+        }
+    }
+
+    suspend fun getWeight(context: Context): Double {
+        val prefs = context.dataStore.data.first()
+        return prefs[WEIGHT] ?: 0.0
+    }
+    suspend fun saveHeight(context: Context, height: Double) {
+        context.dataStore.edit { prefs ->
+            prefs[HEIGHT] = height
+        }
+    }
+
+    suspend fun getHeight(context: Context): Double {
+        val prefs = context.dataStore.data.first()
+        return prefs[HEIGHT] ?: 0.0
+    }
+
+    suspend fun saveName(context: Context, name:String) {
+        context.dataStore.edit { prefs ->
+            prefs[NAME] = name
+        }
+    }
+
+    suspend fun getName(context: Context): String {
+        val prefs = context.dataStore.data.first()
+        return prefs[NAME] ?: ""
+    }
+    suspend fun saveAge(context: Context, age: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[AGE] = age
+        }
+    }
+
+    suspend fun getAge(context: Context): Int {
+        val prefs = context.dataStore.data.first()
+        return prefs[AGE] ?: 0
+    }
     suspend fun saveMidnightBase(context: Context, steps: Int) {
         context.dataStore.edit { prefs ->
             prefs[MIDNIGHT_BASE] = steps

@@ -19,16 +19,23 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.yash.fitnesstracker.MainApplication
 import com.yash.fitnesstracker.Service.AutoWorkManager
+import com.yash.fitnesstracker.Service.DataStoreManager
+import com.yash.fitnesstracker.database.ActivityDTO
+import com.yash.fitnesstracker.database.ActivityHistoryEntities
 import com.yash.fitnesstracker.database.StepsDTO
 import com.yash.fitnesstracker.database.StepsEntities
+import com.yash.fitnesstracker.repository.ActivityHistoryRepo
 import com.yash.fitnesstracker.repository.OnlineServerDbRep
 import com.yash.fitnesstracker.repository.StepRepository
 import com.yash.fitnesstracker.repository.StepsLocalDbRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -39,7 +46,8 @@ import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.O)
 class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
-    private val onlineServerDbRep: OnlineServerDbRep): ViewModel()
+    private val onlineServerDbRep: OnlineServerDbRep,
+    private val activityHistoryRepo: ActivityHistoryRepo): ViewModel()
 {
 
     private val _uiState = MutableStateFlow(AppUiState())
@@ -91,6 +99,20 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
         }
     }
 
+    fun syncStepsOncePerDay() {
+        viewModelScope.launch {
+            val lastSyncDate = DataStoreManager.getLastSyncDate()
+            if (!DataStoreManager.isToday(lastSyncDate)) {
+                Log.d("Server call","Stress")
+                getAllSteps() // <- Your existing server sync function
+                val today = LocalDate.now().format(DateTimeFormatter.ISO_DATE)
+                DataStoreManager.setLastSyncDate(today)
+            }
+        }
+    }
+
+
+
     suspend fun insertOrUpdateInRoom(steps:Int,formattedDate: String)
     {
 
@@ -133,6 +155,74 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
             .enqueueUniquePeriodicWork("dailyUpload", ExistingPeriodicWorkPolicy.REPLACE,workRequest)
     }
 
+    fun getActivityHistory()
+    {
+        viewModelScope.launch {
+            val activity = activityHistoryRepo.getData()
+
+            _uiState.value = _uiState.value.copy(activityHistory = activity)
+        }
+    }
+
+    fun addActivity(activityDTO: ActivityDTO) {
+        viewModelScope.launch {
+            val entity = ActivityHistoryEntities(
+                name = activityDTO.name,
+                time = activityDTO.time,
+                cal = activityDTO.cal
+            )
+            activityHistoryRepo.insert(entity)
+            delay(500L)
+            getActivityHistory()
+
+        }
+    }
+
+
+    fun uploadImage(image: MultipartBody.Part,userName: RequestBody)
+    {
+        viewModelScope.launch {
+            try {
+                val response = onlineServerDbRep.uploadAndGetImage(image, userName)
+                if (response.isSuccessful) {
+                    val imageUrl = response.body()?.imageUrl
+                    _uiState.value = _uiState.value.copy(imageUrl = imageUrl)
+                    Log.d("UPLOAD", "Image uploaded: $imageUrl")
+                } else {
+                    Log.e("UPLOAD", "Upload failed: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("UPLOAD", "Exception: ${e.message}")
+            }
+        }
+    }
+
+    fun getImageUrl()
+    {
+        viewModelScope.launch {
+            try {
+                val response = onlineServerDbRep.getImageUrl()
+                if(response.code()==200)
+                {
+                    val imageUrl = response.body()
+                    _uiState.value = _uiState.value.copy(imageUrl=imageUrl)
+                    Log.d("imageUrl",imageUrl.toString())
+                }
+                else
+                {
+                    Log.d("imageUrl","Not found")
+                }
+            } catch (e: Exception) {
+                Log.e("error",e.toString())
+            }
+        }
+    }
+
+
+
+
+
+
 
 
     companion object{
@@ -141,7 +231,9 @@ class appViewModel(private val stepsLocalDbRepository: StepsLocalDbRepository,
                 val application = this[APPLICATION_KEY] as MainApplication
                 val repository = application.container.stepsLocalDbRepository
                 val repositoryServerDb = application.container.onlineServerDbRep
-                appViewModel(repository,repositoryServerDb)
+                val activityHistoryRepo = application.container.activityHistoryRepo
+                appViewModel(repository,repositoryServerDb,
+                    activityHistoryRepo)
             }
         }
     }

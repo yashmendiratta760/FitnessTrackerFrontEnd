@@ -7,7 +7,10 @@ enum class Screens
     Otp,
     Home,
     DailyHistory,
-    MonthlyHistory,
+    Activity,
     WeeklyHistory,
-    Splash
+    Splash,
+    ActivityRunning,
+    Profile,
+    History
 }

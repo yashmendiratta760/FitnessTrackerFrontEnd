@@ -133,7 +133,6 @@ class ForegroundService:Service(), SensorEventListener
                         DataStoreManager.saveTime(applicationContext, elapsed)
                     }
                     val x = (elapsed / 1000) / 60
-                    Log.d("Stopwatch", "Elapsed: $x)")
                 }
                 isStopwatchRunning = true
             }
