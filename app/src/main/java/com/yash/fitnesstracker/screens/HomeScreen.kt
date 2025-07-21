@@ -1,5 +1,8 @@
 package com.yash.fitnesstracker.screens
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -36,11 +39,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.screens.components.CircularProgress
 import com.yash.fitnesstracker.screens.components.CustomizedButton
 import com.yash.fitnesstracker.service.DataStoreManager
+import com.yash.fitnesstracker.service.ForegroundService
 import com.yash.fitnesstracker.utils.Bg
 import com.yash.fitnesstracker.viewmodel.AppUiState
 import com.yash.fitnesstracker.viewmodel.UserViewModel
@@ -92,13 +97,34 @@ fun HomeScreen(modifier: Modifier= Modifier,
     val steps = appUiState.steps
     Log.d("UI", "Steps from ViewModel: $steps")
     val userUiState = userViewModel.uiState.collectAsState()
-    val stepsGoal = userUiState.value.stepsGoal
-    val progress = steps / stepsGoal.toFloat()
+    val stepsGoal = userUiState.value.stepsGoal.toFloatOrNull() ?: 0f
+    val progress = if (stepsGoal > 0f) steps / stepsGoal else 0f
+    val safeProgress = progress.coerceIn(0f, 1f)
+
 
     LaunchedEffect(steps) {
         if(steps<0)
         {
             DataStoreManager.saveMidnightBase(context,0)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        // ✅ Check if both permissions are granted
+        val hasActivityRecognition = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACTIVITY_RECOGNITION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val hasHealthPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.FOREGROUND_SERVICE_HEALTH
+            ) == PackageManager.PERMISSION_GRANTED
+        } else true
+
+        // ✅ If granted, start foreground service
+        if (hasActivityRecognition && hasHealthPermission) {
+            val intent = Intent(context, ForegroundService::class.java)
+            ContextCompat.startForegroundService(context, intent)
         }
     }
 
@@ -143,7 +169,7 @@ fun HomeScreen(modifier: Modifier= Modifier,
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.size(170.dp)
                         ) {
-                            CircularProgress(progress = progress, modifier = Modifier.fillMaxSize(),
+                            CircularProgress(progress = safeProgress, modifier = Modifier.fillMaxSize(),
                                 isDarkTheme=isDarkTheme)
                             Text(text = steps.toString(), fontSize = 40.sp)
                         }

@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import com.yash.fitnesstracker.service.SensorManagerHelper
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.repository.TokenManager
 import com.yash.fitnesstracker.viewmodel.AppViewModel
@@ -29,7 +28,6 @@ fun SplashScreen(
     appViewModel: AppViewModel
 ) {
     val context = LocalContext.current
-    val sensorManagerHelper = remember { SensorManagerHelper(context) }
 
 
 
@@ -37,11 +35,11 @@ fun SplashScreen(
 
     LaunchedEffect(Unit) {
         token = TokenManager.getToken(context)
-        sensorManagerHelper.startListening()
-        appViewModel.getActivityHistory()
-        appViewModel.getImageUrl()
+
         delay(1000) // Optional: gives smooth transition
         if (token != null) {
+            appViewModel.getActivityHistory()
+            appViewModel.getImageUrl()
             navController.navigate(Screens.Home.name) {
                 popUpTo(0) { inclusive = true }
             }

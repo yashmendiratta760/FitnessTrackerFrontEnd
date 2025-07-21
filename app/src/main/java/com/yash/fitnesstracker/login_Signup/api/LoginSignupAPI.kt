@@ -18,4 +18,7 @@ interface LoginSignupAPI
 
     @POST("users/login")
     suspend fun login(@Body loginDTO: LoginDTO): Response<JwtResponse>
+
+    @POST("users/getEmail")
+    suspend fun getEmail(@Body loginDTO: LoginDTO):Response<String>
 }

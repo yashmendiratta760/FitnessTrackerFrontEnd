@@ -12,6 +12,7 @@ interface LoginSignupRepository
     suspend fun generateOtp(user: UserDTO):Response<String>
     suspend fun signup(validate: OtpValidateData):Response<Unit>
     suspend fun login(loginDTO: LoginDTO): Response<JwtResponse>
+    suspend fun getEmail(loginDTO: LoginDTO):Response<String>
 }
 
 class LoginSignupRepositoryImpl(private val api: LoginSignupAPI):LoginSignupRepository
@@ -26,6 +27,10 @@ class LoginSignupRepositoryImpl(private val api: LoginSignupAPI):LoginSignupRepo
 
     override suspend fun login(loginDTO: LoginDTO): Response<JwtResponse> {
         return api.login(loginDTO)
+    }
+
+    override suspend fun getEmail(loginDTO: LoginDTO): Response<String> {
+        return api.getEmail(loginDTO)
     }
 
 

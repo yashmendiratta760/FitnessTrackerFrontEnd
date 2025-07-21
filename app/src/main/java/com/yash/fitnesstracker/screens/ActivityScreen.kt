@@ -57,7 +57,7 @@ fun ActivityScreen(navController: NavHostController,
                 LazyColumn {
                     items(Activities){activity->
                         CustomizedButton(text = activity.name, onClick = {
-                            navController.navigate(route = "${Screens.ActivityRunning.name}?ScreenName=${activity.name}&Met=${activity.MET}")
+                            navController.navigate(route = "${Screens.ActivityRunning.name}?ScreenName=${activity.name}&Met=${activity.met}")
                         },
                             icon = activity.icon,
                             iconColor = activity.color,

@@ -20,4 +20,5 @@ class UserViewModel(): ViewModel()
             }
         }
     }
+
 }

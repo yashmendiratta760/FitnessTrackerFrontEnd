@@ -34,7 +34,7 @@ object DataStoreManager {
     private val HEIGHT = doublePreferencesKey("height")
     private val STEPS_GOAL = intPreferencesKey("stepsGoal")
     private val LAST_SYNC_DATE = stringPreferencesKey("lastSyncDate")
-
+    private val EMAIL_ID = stringPreferencesKey("email")
 
     suspend fun getLastSyncDate(): String? {
         val preferences = appContext.dataStore.data.first()
@@ -69,8 +69,17 @@ object DataStoreManager {
                 age = (prefs[AGE] ?: 0).toString(),
                 weight = (prefs[WEIGHT] ?: 0.0).toString(),
                 height = (prefs[HEIGHT] ?: 0.0).toString(),
-                stepsGoal = (prefs[STEPS_GOAL] ?: 0).toString()
+                stepsGoal = (prefs[STEPS_GOAL] ?: 0).toString(),
+                userName = (prefs[USER_NAME] ?:""),
+                email = (prefs[EMAIL_ID] ?:"")
             )
+        }
+    }
+
+    suspend fun saveEmail(context: Context,email:String)
+    {
+        context.dataStore.edit { prefs->
+            prefs[EMAIL_ID] = email
         }
     }
 

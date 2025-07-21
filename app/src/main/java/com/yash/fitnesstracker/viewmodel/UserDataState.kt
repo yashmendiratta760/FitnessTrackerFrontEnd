@@ -5,5 +5,7 @@ data class UserDataState(
     val age: String = "",
     val weight: String = "",
     val height: String = "",
-    val stepsGoal: String = ""
+    val stepsGoal: String = "1",
+    val email:String = "Email@email.com",
+    val userName:String = "userName"
 )

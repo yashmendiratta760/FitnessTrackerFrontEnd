@@ -66,13 +66,15 @@ fun Navigate(modifier: Modifier= Modifier,
                 appViewModel=appViewModel)
         }
         composable(route = Screens.Signup.name) {
-            SignUp(navController = navController, loginSignupViewModel)
+            SignUp(navController = navController, loginSignupViewModel,
+                loginSignupUiState=loginSignupUiState)
         }
         composable(route= Screens.Login.name) {
-            Login(navController, loginSignupViewModel,loginSignupUiState)
+            Login(navController, loginSignupViewModel,loginSignupUiState, appViewModel = appViewModel)
         }
         composable(route = Screens.Otp.name) {
-            Otp(loginSignupViewModel,navController)
+            Otp(loginSignupViewModel,navController,
+                loginSignupUiState=loginSignupUiState)
         }
         composable(route = Screens.Home.name,
             exitTransition = {

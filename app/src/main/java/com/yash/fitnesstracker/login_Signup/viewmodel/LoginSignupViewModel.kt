@@ -101,9 +101,11 @@ class LoginSignupViewModel(private val repository: LoginSignupRepositoryImpl,
         viewModelScope.launch {
 
             try {
+                val email = repository.getEmail(loginDTO)
                 val response = repository.login(loginDTO)
                 if(response.isSuccessful)
                 {
+                    DataStoreManager.saveEmail(context, email = email.body()!!)
                     val jwtToken = response.body()?.token
                     Log.d("jwt token", jwtToken?: "not found")
                     jwtToken?.let {

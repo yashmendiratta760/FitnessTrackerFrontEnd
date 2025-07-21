@@ -47,7 +47,6 @@ import java.io.FileOutputStream
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(
     navController: NavHostController,
@@ -256,7 +255,7 @@ fun UserProfileScreen(
                 modifier = Modifier.padding(8.dp))
             Spacer(Modifier.height(8.dp))
             TextField(
-                value = "yash@gmail",
+                value = userUiState.value.email,
                 onValueChange = { },
                 label = { Text("Email") },
                 enabled = false,
@@ -275,7 +274,7 @@ fun UserProfileScreen(
 
             )
             TextField(
-                value = "_yash_",
+                value = userUiState.value.userName,
                 onValueChange = { },
                 label = { Text("User Name") },
                 enabled = false,

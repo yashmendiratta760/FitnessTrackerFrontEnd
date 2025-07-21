@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -56,15 +57,18 @@ import com.yash.fitnesstracker.R
 import com.yash.fitnesstracker.service.DataStoreManager
 import com.yash.fitnesstracker.navigation.Screens
 import com.yash.fitnesstracker.ui.theme.test
+import com.yash.fitnesstracker.viewmodel.AppViewModel
 import kotlinx.coroutines.launch
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("ConfigurationScreenWidthHeight")
 @Composable
 fun Login(
     navController:NavHostController,
     loginSignupViewModel: LoginSignupViewModel,
-    uiState: LoginSignupUiState
+    uiState: LoginSignupUiState,
+    appViewModel: AppViewModel
 )
 {
 
@@ -104,8 +108,10 @@ fun Login(
     LaunchedEffect(uiState.loginAttempted){
         if (uiState.loginAttempted) {
             if (uiState.isLoggedin) {
+                appViewModel.getActivityHistory()
+                appViewModel.getImageUrl()
 
-                navController.navigate(Screens.Home.name) {
+                navController.navigate(Screens.Profile.name) {
                     popUpTo(0) { inclusive = true }
                 }
                 Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
